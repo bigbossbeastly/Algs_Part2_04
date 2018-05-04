@@ -1,13 +1,20 @@
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.TST;
+
 public class BoggleSolver 
 {
-	private HashSet<String> dictionary = new HashSet<String>();
+	private int dimension = -1;
+	private boolean solved = false;
+	private ArrayList<String> wordsFound = new ArrayList<String>();
+	private TST<Integer> dictionary = new TST<Integer>();
+	
 	private HashMap<Integer, Integer> lengthScore = new HashMap<Integer, Integer>();
-	private HashMap<String, Boolean> wordsFound = new HashMap<String, Boolean>();
 	
 	// Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
@@ -34,57 +41,159 @@ public class BoggleSolver
     	// Setup HashSet for easy querying of words
     	for (int i = 0; i < d.length; i++)
     	{
-    		dictionary.add(d[i]);
+    		dictionary.put(d[i], i);
     	}
     }
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board)
     {
-    	return new ArrayList<String>();
+    	if (dimension == -1)
+    	{
+    		dimension = board.cols();
+    	}
+    	
+    	if (!solved)
+    	{
+    		solveBoard(board);
+    	}
+
+    	return wordsFound;
+    }
+    
+    private int convertTo1D(BoggleBoard board, int x, int y)
+	{
+		return dimension * y + x;
+	}
+    
+    // run recursive DFS
+    private void solveBoard(BoggleBoard board)
+    {
+    	solved = true;
+    	
+    	for (int y = 0; y < dimension; y++)
+    	{
+    		for (int x = 0; x < dimension; x++)
+        	{
+    			System.out.println("Next to examine: " + x + ", " + y + " (" + board.getLetter(y, x) + ")");
+    			HashSet<Integer> lettersUsed = new HashSet<Integer>();
+    			appendNeighbor("", board, x, y, lettersUsed);
+        	}
+    	}
+    }
+    
+    private void appendNeighbor(String wordSoFar, BoggleBoard board, int x, int y, HashSet<Integer> lettersUsed)
+    {
+    	if (lettersUsed.contains(convertTo1D(board, x, y)))
+    		return;
+    	
+    	char nextLetter = board.getLetter(y, x);
+    	wordSoFar += nextLetter;
+    	if (nextLetter == 'Q')
+    	{
+    		wordSoFar += "U";
+    	}
+    	lettersUsed = new HashSet<Integer>(lettersUsed);
+    	lettersUsed.add(convertTo1D(board, x, y));
+    	System.out.println("Word so far: " + wordSoFar);
+    	
+    	Iterable<String> it = dictionary.keysWithPrefix(wordSoFar);
+    	if (!it.iterator().hasNext())
+    	{
+    		return;
+    	}
+
+		if (wordSoFar.length() > 2 && dictionary.contains(wordSoFar) && !wordsFound.contains(wordSoFar))
+		{
+			wordsFound.add(wordSoFar);
+		}
+    	
+    	// Run recursion on neighboring positions
+    	int upperLimit = dimension - 1;
+    	
+    	// Up
+    	if (y > 0)
+    		appendNeighbor(wordSoFar, board, x, y - 1, lettersUsed);
+    	
+    	// Down
+    	if (y < upperLimit)
+    		appendNeighbor(wordSoFar, board, x, y + 1, lettersUsed);
+    	
+    	// Left
+    	if (x > 0)
+    		appendNeighbor(wordSoFar, board, x - 1, y, lettersUsed);
+    	
+    	// Right
+    	if (x < upperLimit)
+    		appendNeighbor(wordSoFar, board, x + 1, y, lettersUsed);
+    	
+    	// Up-Left
+    	if (y > 0 && x > 0)
+    		appendNeighbor(wordSoFar, board, x - 1, y - 1, lettersUsed);
+    		
+    	// Up-Right
+    	if (y > 0 && x < upperLimit)
+    		appendNeighbor(wordSoFar, board, x + 1, y - 1, lettersUsed);
+    	
+    	// Down-Left
+    	if (y < upperLimit && x > 0)
+    		appendNeighbor(wordSoFar, board, x - 1, y + 1, lettersUsed);
+    	
+    	// Down-Right
+    	if (y < upperLimit && x < upperLimit)
+    		appendNeighbor(wordSoFar, board, x + 1, y + 1, lettersUsed);
     }
 
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
-    // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word)
     {
-    	int wordLength = word.length();
-    	
-    	if (wordLength > 8)
+    	if (dictionary.contains(word))
     	{
-    		wordLength = 8;
+	    	int wordLength = word.length();
+	    	
+	    	if (wordLength > 8)
+	    	{
+	    		wordLength = 8;
+	    	}
+	    	
+	    	return lengthScore.get(wordLength);
     	}
     	
-    	return lengthScore.get(wordLength);
+    	return 0;
     }
     
-	public static void main(String[] args) 
-	{
-		// TODO Auto-generated method stub
-		String[] words = new String[10];
-		words[0] = "To";
-		words[1] = "And";
-		words[2] = "Test";
-		words[3] = "Large";
-		words[4] = "Larger";
-		words[5] = "Largest";
-		words[6] = "Surprise";
-		words[7] = "Surprises";
-		words[8] = "Watermelon";
-		words[9] = "Watermelons";
-		
-		BoggleSolver bg = new BoggleSolver(words);
-		System.out.println(bg.scoreOf(words[0]));
-		System.out.println(bg.scoreOf(words[1]));
-		System.out.println(bg.scoreOf(words[2]));
-		System.out.println(bg.scoreOf(words[3]));
-		System.out.println(bg.scoreOf(words[4]));
-		System.out.println(bg.scoreOf(words[5]));
-		System.out.println(bg.scoreOf(words[6]));
-		System.out.println(bg.scoreOf(words[7]));
-		System.out.println(bg.scoreOf(words[8]));
-		System.out.println(bg.scoreOf(words[9]));
-		
-		System.out.println(bg.dict.contains("Tos"));
-	}
+    public static void main(String[] args) 
+    {
+    	/*
+        In in = new In(args[0]);
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        BoggleBoard board = new BoggleBoard(args[1]);
+        int score = 0;
+        for (String word : solver.getAllValidWords(board)) 
+        {
+            StdOut.println(word);
+            score += solver.scoreOf(word);
+        }
+        StdOut.println("Score = " + score);
+        */
+    	
+        //-----------------------------------------------------
+    	File dictF = new File("C:\\Users\\kpeterson\\Desktop\\VS_Projects\\Boggle\\dictionary-yawl.txt");
+        In in = new In(dictF);
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        System.out.println(solver.scoreOf("ABACAS"));
+        
+        String boardAsString = "C:\\Users\\kpeterson\\Desktop\\VS_Projects\\Boggle\\basic_board.txt";
+        BoggleBoard board = new BoggleBoard(boardAsString);
+        
+        int score = 0;
+        for (String word : solver.getAllValidWords(board)) 
+        {
+            StdOut.println(word);
+            score += solver.scoreOf(word);
+        }
+        StdOut.println("Score = " + score);
+    }
 }
