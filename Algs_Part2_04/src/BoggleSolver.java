@@ -1,3 +1,4 @@
+//import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +9,6 @@ import edu.princeton.cs.algs4.TST;
 
 public class BoggleSolver 
 {
-	private int dimension = -1;
 	private boolean solved = false;
 	private ArrayList<String> wordsFound = new ArrayList<String>();
 	private TST<Integer> dictionary = new TST<Integer>();
@@ -47,11 +47,6 @@ public class BoggleSolver
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board)
     {
-    	if (dimension == -1)
-    	{
-    		dimension = board.cols();
-    	}
-    	
     	if (!solved)
     	{
     		solveBoard(board);
@@ -62,7 +57,7 @@ public class BoggleSolver
     
     private int convertTo1D(BoggleBoard board, int x, int y)
 	{
-		return dimension * y + x;
+		return board.cols() * y + x;
 	}
     
     // run recursive DFS
@@ -70,9 +65,9 @@ public class BoggleSolver
     {
     	solved = true;
     	
-    	for (int y = 0; y < dimension; y++)
+    	for (int y = 0; y < board.rows(); y++)
     	{
-    		for (int x = 0; x < dimension; x++)
+    		for (int x = 0; x < board.cols(); x++)
         	{
     			HashSet<Integer> lettersUsed = new HashSet<Integer>();
     			appendNeighbor("", board, x, y, lettersUsed);
@@ -106,14 +101,15 @@ public class BoggleSolver
 		}
     	
     	// Run recursion on neighboring positions
-    	int upperLimit = dimension - 1;
+    	int upperY = board.rows() - 1;
+    	int upperX = board.cols() - 1;
     	
     	// Up
     	if (y > 0)
     		appendNeighbor(wordSoFar, board, x, y - 1, lettersUsed);
     	
     	// Down
-    	if (y < upperLimit)
+    	if (y < upperY)
     		appendNeighbor(wordSoFar, board, x, y + 1, lettersUsed);
     	
     	// Left
@@ -121,7 +117,7 @@ public class BoggleSolver
     		appendNeighbor(wordSoFar, board, x - 1, y, lettersUsed);
     	
     	// Right
-    	if (x < upperLimit)
+    	if (x < upperX)
     		appendNeighbor(wordSoFar, board, x + 1, y, lettersUsed);
     	
     	// Up-Left
@@ -129,15 +125,15 @@ public class BoggleSolver
     		appendNeighbor(wordSoFar, board, x - 1, y - 1, lettersUsed);
     		
     	// Up-Right
-    	if (y > 0 && x < upperLimit)
+    	if (y > 0 && x < upperX)
     		appendNeighbor(wordSoFar, board, x + 1, y - 1, lettersUsed);
     	
     	// Down-Left
-    	if (y < upperLimit && x > 0)
+    	if (y < upperY && x > 0)
     		appendNeighbor(wordSoFar, board, x - 1, y + 1, lettersUsed);
     	
     	// Down-Right
-    	if (y < upperLimit && x < upperLimit)
+    	if (y < upperY && x < upperX)
     		appendNeighbor(wordSoFar, board, x + 1, y + 1, lettersUsed);
     }
 
@@ -161,6 +157,7 @@ public class BoggleSolver
     
     public static void main(String[] args) 
     {
+    	
         In in = new In(args[0]);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
@@ -173,23 +170,26 @@ public class BoggleSolver
         }
         StdOut.println("Score = " + score);
     	
+    	
         /*
     	File dictF = new File("C:\\Users\\kpeterson\\Desktop\\VS_Projects\\Boggle\\dictionary-yawl.txt");
         In in = new In(dictF);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
-        System.out.println(solver.scoreOf("ABACAS"));
         
         String boardAsString = "C:\\Users\\kpeterson\\Desktop\\VS_Projects\\Boggle\\basic_board.txt";
         BoggleBoard board = new BoggleBoard(boardAsString);
         
         int score = 0;
+        int count = 0;
         for (String word : solver.getAllValidWords(board)) 
         {
+        	count++;
             StdOut.println(word);
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
+        System.out.println("Total count: " + count);
         */
     }
 }
