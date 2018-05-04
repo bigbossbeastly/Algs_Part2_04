@@ -75,7 +75,6 @@ public class BoggleSolver
     	{
     		for (int x = 0; x < dimension; x++)
         	{
-    			System.out.println("Next to examine: " + x + ", " + y + " (" + board.getLetter(y, x) + ")");
     			HashSet<Integer> lettersUsed = new HashSet<Integer>();
     			appendNeighbor("", board, x, y, lettersUsed);
         	}
@@ -95,7 +94,6 @@ public class BoggleSolver
     	}
     	lettersUsed = new HashSet<Integer>(lettersUsed);
     	lettersUsed.add(convertTo1D(board, x, y));
-    	System.out.println("Word so far: " + wordSoFar);
     	
     	Iterable<String> it = dictionary.keysWithPrefix(wordSoFar);
     	if (!it.iterator().hasNext())
@@ -164,7 +162,6 @@ public class BoggleSolver
     
     public static void main(String[] args) 
     {
-    	/*
         In in = new In(args[0]);
         String[] dictionary = in.readAllStrings();
         BoggleSolver solver = new BoggleSolver(dictionary);
@@ -176,9 +173,8 @@ public class BoggleSolver
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
-        */
     	
-        //-----------------------------------------------------
+        /*
     	File dictF = new File("C:\\Users\\kpeterson\\Desktop\\VS_Projects\\Boggle\\dictionary-yawl.txt");
         In in = new In(dictF);
         String[] dictionary = in.readAllStrings();
@@ -195,5 +191,6 @@ public class BoggleSolver
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
+        */
     }
 }
