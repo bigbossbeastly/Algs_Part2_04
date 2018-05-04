@@ -1,4 +1,4 @@
-//import java.io.File;
+// import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,8 +9,7 @@ import edu.princeton.cs.algs4.TST;
 
 public class BoggleSolver 
 {
-	private boolean solved = false;
-	private ArrayList<String> wordsFound = new ArrayList<String>();
+	private ArrayList<String> wordsFound = null;
 	private TST<Integer> dictionary = new TST<Integer>();
 	
 	private HashMap<Integer, Integer> lengthScore = new HashMap<Integer, Integer>();
@@ -47,11 +46,8 @@ public class BoggleSolver
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board)
     {
-    	if (!solved)
-    	{
-    		solveBoard(board);
-    	}
-
+    	wordsFound = new ArrayList<String>();
+    	solveBoard(board);
     	return wordsFound;
     }
     
@@ -63,8 +59,6 @@ public class BoggleSolver
     // run recursive DFS
     private void solveBoard(BoggleBoard board)
     {
-    	solved = true;
-    	
     	for (int y = 0; y < board.rows(); y++)
     	{
     		for (int x = 0; x < board.cols(); x++)
