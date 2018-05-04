@@ -10,7 +10,7 @@ import edu.princeton.cs.algs4.TST;
 public class BoggleSolver 
 {
 	private ArrayList<String> wordsFound = null;
-	private TST<Integer> dictionary = new TST<Integer>();
+	private TST<Integer> dictionary = null;
 	
 	private HashMap<Integer, Integer> lengthScore = new HashMap<Integer, Integer>();
 	
@@ -36,6 +36,8 @@ public class BoggleSolver
     
     private void createDictionary(String[] d)
     {
+    	dictionary = new TST<Integer>();
+    	
     	// Setup HashSet for easy querying of words
     	for (int i = 0; i < d.length; i++)
     	{
